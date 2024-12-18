@@ -38,9 +38,9 @@ fn main() -> anyhow::Result<()> {
         embeddings.serialize(&mut embser)?;
         let embedding = serde_json::from_slice(&buffer)?;
 
-        document.insert("_vector".to_owned(), embedding);
+        document.insert("_vectors".to_owned(), embedding);
         serde_json::to_writer(&mut writer, &document)?;
-        writer.write(&[b'\n'])?;
+        writer.write_all(b"\n")?;
     }
 
     writer.flush()?;
