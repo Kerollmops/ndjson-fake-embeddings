@@ -23,7 +23,6 @@ fn main() -> anyhow::Result<()> {
     let mut writer = BufWriter::new(std::io::stdout());
 
     let mut buffer = Vec::new();
-    let mut embedding_buffer = Vec::new();
     let mut rng = rand::thread_rng();
     for (result, embedding) in reader.lines().zip(embeddings.iter().cycle()) {
         let line = result?;
@@ -31,13 +30,11 @@ fn main() -> anyhow::Result<()> {
 
         // Alterate a bit every embedding
         let alt = rng.gen_range(-0.1..=0.1);
-        embedding_buffer.resize(embedding.len(), 0.0);
-        embedding_buffer.copy_from_slice(embedding);
-        embedding_buffer.iter_mut().for_each(|x| *x += alt);
+        let embedding: Vec<f32> = embedding.iter().map(|x| x + alt).collect();
 
         buffer.clear();
         let mut embser = Serializer::with_formatter(&mut buffer, SmallFloatFormatter::new());
-        let embeddings = json!({ "default": embedding_buffer });
+        let embeddings = json!({ "default": embedding });
         embeddings.serialize(&mut embser)?;
         let embedding = serde_json::from_slice(&buffer)?;
 
