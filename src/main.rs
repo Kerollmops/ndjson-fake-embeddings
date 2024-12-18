@@ -40,6 +40,7 @@ fn main() -> anyhow::Result<()> {
 
         document.insert("_vector".to_owned(), embedding);
         serde_json::to_writer(&mut writer, &document)?;
+        writer.write(&[b'\n'])?;
     }
 
     writer.flush()?;
